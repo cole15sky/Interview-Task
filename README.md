@@ -17,8 +17,22 @@ This project is a RESTful API built with Django and Django REST Framework (DRF),
 ## 🛠 Setup Instructions
 
 ### 1. Clone the Repository
+git clone https://github.com/cole15sky/Interview-Task.git
+cd mytask
 
-```bash
-git clone https://github.com/your-username/your-repo.git
-cd your-repo
+### 2. Create a Virtual Environment
+python -m venv env
+source env/bin/activate  # On Windows: env\Scripts\activate
+
+### 3. Install Dependencies
+pip install -r requirements.txt
+
+### 4. Apply Migrations & Create Superuser
+python manage.py makemigrations
+python manage.py migrate
+python manage.py createsuperuser
+
+### 5. Run the Development Server
+python manage.py runserver
+
 
