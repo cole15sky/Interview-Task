@@ -1,4 +1,4 @@
-# from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import status, permissions
@@ -6,14 +6,12 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from .serializers import UserSerializer, LoginSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
 
 
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])
 def signup(request):
-    """
-    User signup view to register new users.
-    """
     if request.method == 'POST':
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
@@ -25,9 +23,6 @@ def signup(request):
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])
 def login(request):
-    """
-    User login view to authenticate and return JWT tokens.
-    """
     if request.method == 'POST':
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
@@ -49,9 +44,6 @@ def login(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def profile(request):
-    """
-    Get the current authenticated user's profile.
-    """
     user = request.user
     user_data = {
         'email': user.email,
@@ -59,3 +51,15 @@ def profile(request):
         'last_name': user.last_name
     }
     return Response(user_data)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def logout(request):
+    try:
+        refresh_token = request.data.get("refresh")
+        token = RefreshToken(refresh_token)
+        token.blacklist()
+        return Response({"detail": "Logout successful."}, status=status.HTTP_205_RESET_CONTENT)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
