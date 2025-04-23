@@ -1,4 +1,6 @@
-from django.contrib.auth import authenticate
+# from django.contrib.auth import authenticate
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import status, permissions
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
@@ -41,3 +43,19 @@ def login(request):
                 })
             return Response({'detail': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    
+    
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def profile(request):
+    """
+    Get the current authenticated user's profile.
+    """
+    user = request.user
+    user_data = {
+        'email': user.email,
+        'first_name': user.first_name,
+        'last_name': user.last_name
+    }
+    return Response(user_data)
